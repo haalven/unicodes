@@ -9,6 +9,10 @@ import unicodedata
 
 
 
+# common output
+
+def unicode_info(number, hexnum, char):
+
 categories = {
     'Lu': 'Uppercase Letter',
     'Ll': 'Lowercase Letter',
@@ -51,10 +55,6 @@ categories = {
 }
 
 
-
-# common output
-
-def unicode_info(number, hexnum, char):
 
     try: ucname = unicodedata.name(char)
     except Exception: ucname = 'unknown'
