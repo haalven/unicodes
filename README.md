@@ -18,6 +18,6 @@ Unicode 1430 [hex: 0x596 ] is: ֖ (Nonspacing Mark › HEBREW ACCENT TIPEHA)
 Unicode 1492 [hex: 0x5d4 ] is: ה (Other Letter › HEBREW LETTER HE)
 ```
 ```
-$ unicode r 41-5A
-A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 
+$ unicode r 3b1-3c9
+α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω 
 ```
