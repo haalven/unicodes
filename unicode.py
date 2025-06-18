@@ -93,7 +93,7 @@ def c(code): return f('38;5;' + str(code))
 # common output
 def unicode_info(number, hexnum, char):
 
-    if number < 32:
+    if number in controls:
         ucname = controls[number]
     else:
         try: ucname = unicodedata.name(char)
