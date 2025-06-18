@@ -3,7 +3,7 @@ Unicode information
 
 usage: `unicode TYPE INPUT`
 
-types: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-range)
+TYPE: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-range)
 
 examples:
 
