@@ -1,5 +1,5 @@
 # unicodes
-Unicode information
+Unicode / utf8 investigation
 
 usage: `unicode TYPE INPUT`
 
