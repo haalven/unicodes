@@ -16,10 +16,10 @@ Unicode U+72 (114) [72] is: r (Lowercase Letter › LATIN SMALL LETTER R)
 Unicode U+2e (46) [2e] is: . (Other Punctuation › FULL STOP)
 Unicode U+3a (58) [3a] is: : (Other Punctuation › COLON)
 Unicode U+20 (32) [20] is:   (Space Separator › SPACE)
-Unicode U+5d9 (1497) [d7 99] is: י (Other Letter › HEBREW LETTER YOD)
-Unicode U+5d4 (1492) [d7 94] is: ה (Other Letter › HEBREW LETTER HE)
-Unicode U+5d5 (1493) [d7 95] is: ו (Other Letter › HEBREW LETTER VAV)
-Unicode U+5d4 (1492) [d7 94] is: ה (Other Letter › HEBREW LETTER HE)
+Unicode <span style="color:red">U+5d9</span> (1497) [d7 99] is: י (Other Letter › HEBREW LETTER YOD)
+Unicode <span style="color:red">U+5d4</span> (1492) [d7 94] is: ה (Other Letter › HEBREW LETTER HE)
+Unicode <span style="color:red">U+5d5</span> (1493) [d7 95] is: ו (Other Letter › HEBREW LETTER VAV)
+Unicode <span style="color:red">U+5d4</span> (1492) [d7 94] is: ה (Other Letter › HEBREW LETTER HE)
 ```
 ```
 $ unicode r 03b1-03c9
