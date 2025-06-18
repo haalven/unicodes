@@ -182,7 +182,10 @@ match typ:
 
         byte_seq = bytes.fromhex(seq)
 
-        ch = byte_seq.decode('utf-8')
+        try:
+            ch = byte_seq.decode('utf-8')
+        except:
+            exit(f'{byte_seq} is not a valid utf8 byte sequence')
 
         nm = ord(ch)
 
