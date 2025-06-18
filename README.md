@@ -7,7 +7,7 @@ types: s (string), d (decimal), h (hex) or r (hex-range)
 
 examples:
 
-![example screenshot](example.jpg)
+![example screenshot](example1.jpg)
 
 ```
 $ unicode r 03b1-03c9
