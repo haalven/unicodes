@@ -571,6 +571,8 @@ match typ:
         except:
             exit('syntax: unicode r <hexmin>-<hexmax>')
         for nm in range(imin, imax+1):
+            if nm < 32:
+                continue
             ch = chr(nm)
             if ch:
                 print(ch, end=' ')
