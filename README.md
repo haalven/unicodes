@@ -7,7 +7,7 @@ TYPE: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-ra
 
 examples:
 
-![example screenshot](example1.jpg)
+![example screenshot](example.jpg)
 
 ```
 $ unicode r 3b1-3c9
