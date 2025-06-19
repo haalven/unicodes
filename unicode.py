@@ -476,14 +476,14 @@ def unicode_info_output(number, hexnum, char):
         for start, end, name in unicode_blocks:
             if start <= number <= end:
                 block = name
-    except Exception:
+    except:
         pass
 
     # codepoint category
     category = 'unknown'
     try:
         category = codepoint_categories[unicodedata.category(char)]
-    except Exception:
+    except:
         pass
 
     # Unicode full name
@@ -493,7 +493,7 @@ def unicode_info_output(number, hexnum, char):
     else:
         try:
             ucname = unicodedata.name(char)
-        except Exception:
+        except:
             pass 
 
     # print
@@ -532,7 +532,7 @@ match typ:
     case 'd':
         try:
             nm = int(inp)
-        except Exception:
+        except:
             exit('not a decimal number')
         hx = hex(nm)
         ch = chr(nm)
@@ -542,7 +542,7 @@ match typ:
     case 'h':
         try:
             nm = int(inp, 16)
-        except Exception:
+        except:
             exit('not a hex number')
         hx = hex(nm)
         ch = chr(nm)
@@ -568,7 +568,7 @@ match typ:
         smin, _, smax = inp.partition('-')
         try:
             imin, imax = int(smin,16), int(smax,16)
-        except Exception:
+        except:
             exit('syntax: unicode r <hexmin>-<hexmax>')
         for nm in range(imin, imax+1):
             ch = chr(nm)
