@@ -9,7 +9,7 @@ TYPE: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-ra
 
 ## investigate strange characters
 
-![example screenshot](example.jpg)
+![example screenshot](example1.jpg)
 
 - incl. utf-8 byte sequence
 - incl. Unicode block name
