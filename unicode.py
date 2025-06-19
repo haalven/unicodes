@@ -220,7 +220,10 @@ match typ:
 
         seq = str(inp).replace(' ', '').lower()
 
-        byte_seq = bytes.fromhex(seq)
+        try:
+            byte_seq = bytes.fromhex(seq)
+        except:
+            exit(f'"{seq}" is not a valid hex byte sequence')
 
         try:
             ch = byte_seq.decode('utf-8')
