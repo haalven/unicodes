@@ -5,13 +5,16 @@ usage: `./unicode.py <TYPE> <INPUT>`
 
 TYPE: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-range)
 
-## examples
-
-investigate strange characters:
+## investigate strange characters
 
 ![example screenshot](example.jpg)
 
-print unicode ranges:
+- incl. utf-8 byte sequence
+- incl. Unicode block (according to unicode.org)
+- incl. Codepoint category (according to unicodedata lib)
+- incl. FULL CHARACTER NAME
+
+## print unicode ranges
 
 ```
 $ unicode r 3b1-3c9
