@@ -5,6 +5,7 @@
 
 from sys import argv, exit
 import unicodedata
+import copy
 
 
 categories = {
@@ -141,12 +142,18 @@ def unicode_info(number, hexnum, char):
 
     col = 196 if number >= 128 else 44  # ASCII vs higher
 
+    display_char = copy.copy(char)
+    display_char = display_char.replace('\n', '\\n')
+    display_char = display_char.replace('\t', '\\t')
+    display_char = display_char.replace('\r', '\\r')
+    display_char = display_char.replace('\b', '\\b')
+
     print('Unicode',
           c(col) + unicode_point + f(39),
           '(' + str(number) + ')',
           '[' + f(2) + byte_seq + f(22) + ']',
           'is:',
-          char,
+          display_char,
           '(' + category,
           '›',
           ucname + ')')
