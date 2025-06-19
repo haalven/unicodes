@@ -128,7 +128,7 @@ def c(code): return f('38;5;' + str(code))
 
 # load Unicode blocks csv
 def load_blocks(my_dir):
-    blocks_file = my_dir + '/unicode_blocks.csv'
+    blocks_file = os.path.join(my_dir, 'unicode_blocks.csv')
     blocks = []
     with open(blocks_file, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
