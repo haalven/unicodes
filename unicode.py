@@ -6,6 +6,8 @@
 from sys import argv, exit
 import unicodedata
 import copy
+import csv
+import os
 
 
 categories = {
@@ -41,7 +43,7 @@ categories = {
     'Zl': 'Line Separator',
     'Zp': 'Paragraph Separator',
     'Z' : 'Separator',
-    'Cc': 'C0 or C1 Control Codes',
+    'Cc': 'C0/C1 Control Codes',
     'Cf': 'Format Control Character',
     'Cs': 'Surrogate Code Point',
     'Co': 'Private Use Character',
@@ -124,6 +126,33 @@ def f(code): return '\x1B[' + str(code) + 'm'
 def c(code): return f('38;5;' + str(code))
 
 
+# load Unicode blocks csv
+def load_blocks(my_dir):
+    blocks_file = my_dir + '/unicode_blocks.csv'
+    blocks = []
+    with open(blocks_file, newline='', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if len(row) >= 3:
+                start = int(row[0], 16)
+                end = int(row[1], 16)
+                name = row[2]
+                blocks.append((start, end, name))
+    return blocks
+
+# hex value -> Unicode block name
+def block_name(hex_string, blocks):
+    try:
+        # Convert hex string to integer
+        code_point = int(hex_string, 16)
+        for start, end, name in blocks:
+            if start <= code_point <= end:
+                return name
+        return 'no matching Unicode block found'
+    except ValueError:
+        return 'invalid hexadecimal input'
+
+
 # common output
 def unicode_info(number, hexnum, char):
 
@@ -158,10 +187,19 @@ def unicode_info(number, hexnum, char):
           '[' + f(2) + byte_seq + f(22) + ']',
           'is:',
           dchar,
-          '(' + category,
+          '(' + block_name(hexnum, blocks),
+          '›',
+          category,
           '›',
           ucname + ')')
 
+
+# path
+my_path = os.path.abspath(__file__)
+my_dir  = os.path.dirname(my_path)
+
+# load blocks
+blocks = load_blocks(my_dir)
 
 # cli arg
 myname = argv.pop(0).split('/')[-1]
