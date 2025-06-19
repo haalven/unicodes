@@ -1,7 +1,7 @@
 # unicodes
 Unicode / utf8 investigation
 
-usage: `unicode TYPE INPUT`
+usage: `./unicode.py <TYPE> <INPUT>`
 
 TYPE: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-range)
 
