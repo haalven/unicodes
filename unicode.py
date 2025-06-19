@@ -509,14 +509,13 @@ def unicode_info_output(number, hexnum, char):
         '›',
         ucname + ')')
 
-
-# syntax
+# check syntax
 myname = sys.argv.pop(0).split('/')[-1]
 syntax = f'syntax: {myname} <type> <input>\n'
 syntax += 'types: s (string), d (decimal), h (hex), b (utf8 byte seq) or r (range)'
 if len(sys.argv) < 2: exit(syntax)
 
-# arguments
+# check arguments
 typ, inp = sys.argv[0].lower(), sys.argv[1]
 if not typ in 'sdhbr': exit(syntax)
 
