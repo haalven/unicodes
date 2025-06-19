@@ -10,8 +10,8 @@ TYPE: `s` (string), `d` (decimal), `h` (hex), `b` (utf8 byte seq) or `r` (hex-ra
 ![example screenshot](example.jpg)
 
 - incl. utf-8 byte sequence
-- incl. Unicode block (according to unicode.org)
-- incl. Codepoint category (according to unicodedata lib)
+- incl. Unicode block name
+- incl. Codepoint category
 - incl. FULL CHARACTER NAME
 
 ## print unicode ranges
