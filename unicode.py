@@ -136,7 +136,9 @@ def unicode_info(number, hexnum, char):
     try: category = categories[unicodedata.category(char)]
     except Exception: category = 'unknown'
 
-    unicode_point = f'U+{hexnum[2:]}'
+    unicode_hex = hexnum[2:].upper()
+    while len(unicode_hex) < 4: unicode_hex = '0' + unicode_hex
+    unicode_point = f'U+{unicode_hex}'
 
     byte_seq = ' '.join(f'{b:02x}' for b in char.encode('utf-8'))
 
