@@ -570,7 +570,7 @@ match typ:
         except:
             exit('syntax: unicode r <hexmin>-<hexmax>')
         for nm in range(imin, imax+1):
-            if nm < 32:
+            if nm in control_codes:
                 continue
             ch = chr(nm)
             if ch:
