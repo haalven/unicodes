@@ -497,8 +497,7 @@ def unicode_info_output(number, hexnum, char):
             pass 
 
     # print
-    print('Unicode',
-        c(col) + unicode_point + f(39),
+    print(c(col) + unicode_point + f(39),
         '(' + str(number) + ')',
         '[' + f(2) + byte_seq + f(22) + ']',
         'is:',
