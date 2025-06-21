@@ -574,5 +574,8 @@ match typ:
                 continue
             ch = chr(nm)
             if ch:
-                print(ch, end=' ')
+                try:
+                    print(ch, end=' ')
+                except:
+                    continue
         print()
