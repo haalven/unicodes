@@ -5,7 +5,7 @@ Unicode / utf8 investigation
 
 usage: `./unicode.py -<TYPE> <INPUT>`
 
-TYPE: `-u` (unicode hex key), `-d` (decimal key), `-b` (byte seq utf8), `-s` (string), or `-r` (hex-range)
+TYPE: `-u` (unicode hex key), `-d` (decimal key), `-b` (byte seq utf8), `-s` (string), or `-r` (range of hexkeys)
 
 ## investigate strange characters
 
