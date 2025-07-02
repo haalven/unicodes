@@ -1,466 +1,88 @@
 #! /usr/bin/env python3
 
-# Unicode / utf-8 investigation
+# Unicode investigation, version 2
+# syntax: unicode2 -TYPE DATA
 
-import sys, copy, unicodedata
+import sys, os.path, tomllib, argparse, copy, unicodedata, json
 
-unicode_blocks = (
-    (0, 127, 'Basic Latin'),
-    (128, 255, 'Latin-1 Supplement'),
-    (256, 383, 'Latin Extended-A'),
-    (384, 591, 'Latin Extended-B'),
-    (592, 687, 'IPA Extensions'),
-    (688, 767, 'Spacing Modifier Letters'),
-    (768, 879, 'Combining Diacritical Marks'),
-    (880, 1023, 'Greek and Coptic'),
-    (1024, 1279, 'Cyrillic'),
-    (1280, 1327, 'Cyrillic Supplement'),
-    (1328, 1423, 'Armenian'),
-    (1424, 1535, 'Hebrew'),
-    (1536, 1791, 'Arabic'),
-    (1792, 1871, 'Syriac'),
-    (1872, 1919, 'Arabic Supplement'),
-    (1920, 1983, 'Thaana'),
-    (1984, 2047, 'NKo'),
-    (2048, 2111, 'Samaritan'),
-    (2112, 2143, 'Mandaic'),
-    (2144, 2159, 'Syriac Supplement'),
-    (2160, 2207, 'Arabic Extended-B'),
-    (2208, 2303, 'Arabic Extended-A'),
-    (2304, 2431, 'Devanagari'),
-    (2432, 2559, 'Bengali'),
-    (2560, 2687, 'Gurmukhi'),
-    (2688, 2815, 'Gujarati'),
-    (2816, 2943, 'Oriya'),
-    (2944, 3071, 'Tamil'),
-    (3072, 3199, 'Telugu'),
-    (3200, 3327, 'Kannada'),
-    (3328, 3455, 'Malayalam'),
-    (3456, 3583, 'Sinhala'),
-    (3584, 3711, 'Thai'),
-    (3712, 3839, 'Lao'),
-    (3840, 4095, 'Tibetan'),
-    (4096, 4255, 'Myanmar'),
-    (4256, 4351, 'Georgian'),
-    (4352, 4607, 'Hangul Jamo'),
-    (4608, 4991, 'Ethiopic'),
-    (4992, 5023, 'Ethiopic Supplement'),
-    (5024, 5119, 'Cherokee'),
-    (5120, 5759, 'Unified Canadian Aboriginal Syllabics'),
-    (5760, 5791, 'Ogham'),
-    (5792, 5887, 'Runic'),
-    (5888, 5919, 'Tagalog'),
-    (5920, 5951, 'Hanunoo'),
-    (5952, 5983, 'Buhid'),
-    (5984, 6015, 'Tagbanwa'),
-    (6016, 6143, 'Khmer'),
-    (6144, 6319, 'Mongolian'),
-    (6320, 6399, 'Unified Canadian Aboriginal Syllabics Extended'),
-    (6400, 6479, 'Limbu'),
-    (6480, 6527, 'Tai Le'),
-    (6528, 6623, 'New Tai Lue'),
-    (6624, 6655, 'Khmer Symbols'),
-    (6656, 6687, 'Buginese'),
-    (6688, 6831, 'Tai Tham'),
-    (6832, 6911, 'Combining Diacritical Marks Extended'),
-    (6912, 7039, 'Balinese'),
-    (7040, 7103, 'Sundanese'),
-    (7104, 7167, 'Batak'),
-    (7168, 7247, 'Lepcha'),
-    (7248, 7295, 'Ol Chiki'),
-    (7296, 7311, 'Cyrillic Extended-C'),
-    (7312, 7359, 'Georgian Extended'),
-    (7360, 7375, 'Sundanese Supplement'),
-    (7376, 7423, 'Vedic Extensions'),
-    (7424, 7551, 'Phonetic Extensions'),
-    (7552, 7615, 'Phonetic Extensions Supplement'),
-    (7616, 7679, 'Combining Diacritical Marks Supplement'),
-    (7680, 7935, 'Latin Extended Additional'),
-    (7936, 8191, 'Greek Extended'),
-    (8192, 8303, 'General Punctuation'),
-    (8304, 8351, 'Superscripts and Subscripts'),
-    (8352, 8399, 'Currency Symbols'),
-    (8400, 8447, 'Combining Diacritical Marks for Symbols'),
-    (8448, 8527, 'Letterlike Symbols'),
-    (8528, 8591, 'Number Forms'),
-    (8592, 8703, 'Arrows'),
-    (8704, 8959, 'Mathematical Operators'),
-    (8960, 9215, 'Miscellaneous Technical'),
-    (9216, 9279, 'Control Pictures'),
-    (9280, 9311, 'Optical Character Recognition'),
-    (9312, 9471, 'Enclosed Alphanumerics'),
-    (9472, 9599, 'Box Drawing'),
-    (9600, 9631, 'Block Elements'),
-    (9632, 9727, 'Geometric Shapes'),
-    (9728, 9983, 'Miscellaneous Symbols'),
-    (9984, 10175, 'Dingbats'),
-    (10176, 10223, 'Miscellaneous Mathematical Symbols-A'),
-    (10224, 10239, 'Supplemental Arrows-A'),
-    (10240, 10495, 'Braille Patterns'),
-    (10496, 10623, 'Supplemental Arrows-B'),
-    (10624, 10751, 'Miscellaneous Mathematical Symbols-B'),
-    (10752, 11007, 'Supplemental Mathematical Operators'),
-    (11008, 11263, 'Miscellaneous Symbols and Arrows'),
-    (11264, 11359, 'Glagolitic'),
-    (11360, 11391, 'Latin Extended-C'),
-    (11392, 11519, 'Coptic'),
-    (11520, 11567, 'Georgian Supplement'),
-    (11568, 11647, 'Tifinagh'),
-    (11648, 11743, 'Ethiopic Extended'),
-    (11744, 11775, 'Cyrillic Extended-A'),
-    (11776, 11903, 'Supplemental Punctuation'),
-    (11904, 12031, 'CJK Radicals Supplement'),
-    (12032, 12255, 'Kangxi Radicals'),
-    (12272, 12287, 'Ideographic Description Characters'),
-    (12288, 12351, 'CJK Symbols and Punctuation'),
-    (12352, 12447, 'Hiragana'),
-    (12448, 12543, 'Katakana'),
-    (12544, 12591, 'Bopomofo'),
-    (12592, 12687, 'Hangul Compatibility Jamo'),
-    (12688, 12703, 'Kanbun'),
-    (12704, 12735, 'Bopomofo Extended'),
-    (12736, 12783, 'CJK Strokes'),
-    (12784, 12799, 'Katakana Phonetic Extensions'),
-    (12800, 13055, 'Enclosed CJK Letters and Months'),
-    (13056, 13311, 'CJK Compatibility'),
-    (13312, 19903, 'CJK Unified Ideographs Extension A'),
-    (19904, 19967, 'Yijing Hexagram Symbols'),
-    (19968, 40959, 'CJK Unified Ideographs'),
-    (40960, 42127, 'Yi Syllables'),
-    (42128, 42191, 'Yi Radicals'),
-    (42192, 42239, 'Lisu'),
-    (42240, 42559, 'Vai'),
-    (42560, 42655, 'Cyrillic Extended-B'),
-    (42656, 42751, 'Bamum'),
-    (42752, 42783, 'Modifier Tone Letters'),
-    (42784, 43007, 'Latin Extended-D'),
-    (43008, 43055, 'Syloti Nagri'),
-    (43056, 43071, 'Common Indic Number Forms'),
-    (43072, 43135, 'Phags-pa'),
-    (43136, 43231, 'Saurashtra'),
-    (43232, 43263, 'Devanagari Extended'),
-    (43264, 43311, 'Kayah Li'),
-    (43312, 43359, 'Rejang'),
-    (43360, 43391, 'Hangul Jamo Extended-A'),
-    (43392, 43487, 'Javanese'),
-    (43488, 43519, 'Myanmar Extended-B'),
-    (43520, 43615, 'Cham'),
-    (43616, 43647, 'Myanmar Extended-A'),
-    (43648, 43743, 'Tai Viet'),
-    (43744, 43775, 'Meetei Mayek Extensions'),
-    (43776, 43823, 'Ethiopic Extended-A'),
-    (43824, 43887, 'Latin Extended-E'),
-    (43888, 43967, 'Cherokee Supplement'),
-    (43968, 44031, 'Meetei Mayek'),
-    (44032, 55215, 'Hangul Syllables'),
-    (55216, 55295, 'Hangul Jamo Extended-B'),
-    (55296, 56191, 'High Surrogates'),
-    (56192, 56319, 'High Private Use Surrogates'),
-    (56320, 57343, 'Low Surrogates'),
-    (57344, 63743, 'Private Use Area'),
-    (63744, 64255, 'CJK Compatibility Ideographs'),
-    (64256, 64335, 'Alphabetic Presentation Forms'),
-    (64336, 65023, 'Arabic Presentation Forms-A'),
-    (65024, 65039, 'Variation Selectors'),
-    (65040, 65055, 'Vertical Forms'),
-    (65056, 65071, 'Combining Half Marks'),
-    (65072, 65103, 'CJK Compatibility Forms'),
-    (65104, 65135, 'Small Form Variants'),
-    (65136, 65279, 'Arabic Presentation Forms-B'),
-    (65280, 65519, 'Halfwidth and Fullwidth Forms'),
-    (65520, 65535, 'Specials'),
-    (65536, 65663, 'Linear B Syllabary'),
-    (65664, 65791, 'Linear B Ideograms'),
-    (65792, 65855, 'Aegean Numbers'),
-    (65856, 65935, 'Ancient Greek Numbers'),
-    (65936, 65999, 'Ancient Symbols'),
-    (66000, 66047, 'Phaistos Disc'),
-    (66176, 66207, 'Lycian'),
-    (66208, 66271, 'Carian'),
-    (66272, 66303, 'Coptic Epact Numbers'),
-    (66304, 66351, 'Old Italic'),
-    (66352, 66383, 'Gothic'),
-    (66384, 66431, 'Old Permic'),
-    (66432, 66463, 'Ugaritic'),
-    (66464, 66527, 'Old Persian'),
-    (66560, 66639, 'Deseret'),
-    (66640, 66687, 'Shavian'),
-    (66688, 66735, 'Osmanya'),
-    (66736, 66815, 'Osage'),
-    (66816, 66863, 'Elbasan'),
-    (66864, 66927, 'Caucasian Albanian'),
-    (66928, 67007, 'Vithkuqi'),
-    (67072, 67455, 'Linear A'),
-    (67456, 67519, 'Latin Extended-F'),
-    (67584, 67647, 'Cypriot Syllabary'),
-    (67648, 67679, 'Imperial Aramaic'),
-    (67680, 67711, 'Palmyrene'),
-    (67712, 67759, 'Nabataean'),
-    (67808, 67839, 'Hatran'),
-    (67840, 67871, 'Phoenician'),
-    (67872, 67903, 'Lydian'),
-    (67968, 67999, 'Meroitic Hieroglyphs'),
-    (68000, 68095, 'Meroitic Cursive'),
-    (68096, 68191, 'Kharoshthi'),
-    (68192, 68223, 'Old South Arabian'),
-    (68224, 68255, 'Old North Arabian'),
-    (68288, 68351, 'Manichaean'),
-    (68352, 68415, 'Avestan'),
-    (68416, 68447, 'Inscriptional Parthian'),
-    (68448, 68479, 'Inscriptional Pahlavi'),
-    (68480, 68527, 'Psalter Pahlavi'),
-    (68608, 68687, 'Old Turkic'),
-    (68736, 68863, 'Old Hungarian'),
-    (68864, 68927, 'Hanifi Rohingya'),
-    (69216, 69247, 'Rumi Numeral Symbols'),
-    (69248, 69311, 'Yezidi'),
-    (69312, 69375, 'Arabic Extended-C'),
-    (69376, 69423, 'Old Sogdian'),
-    (69424, 69487, 'Sogdian'),
-    (69488, 69551, 'Old Uyghur'),
-    (69552, 69599, 'Chorasmian'),
-    (69600, 69631, 'Elymaic'),
-    (69632, 69759, 'Brahmi'),
-    (69760, 69839, 'Kaithi'),
-    (69840, 69887, 'Sora Sompeng'),
-    (69888, 69967, 'Chakma'),
-    (69968, 70015, 'Mahajani'),
-    (70016, 70111, 'Sharada'),
-    (70112, 70143, 'Sinhala Archaic Numbers'),
-    (70144, 70223, 'Khojki'),
-    (70272, 70319, 'Multani'),
-    (70320, 70399, 'Khudawadi'),
-    (70400, 70527, 'Grantha'),
-    (70656, 70783, 'Newa'),
-    (70784, 70879, 'Tirhuta'),
-    (71040, 71167, 'Siddham'),
-    (71168, 71263, 'Modi'),
-    (71264, 71295, 'Mongolian Supplement'),
-    (71296, 71375, 'Takri'),
-    (71424, 71503, 'Ahom'),
-    (71680, 71759, 'Dogra'),
-    (71840, 71935, 'Warang Citi'),
-    (71936, 72031, 'Dives Akuru'),
-    (72096, 72191, 'Nandinagari'),
-    (72192, 72271, 'Zanabazar Square'),
-    (72272, 72367, 'Soyombo'),
-    (72368, 72383, 'Unified Canadian Aboriginal Syllabics Extended-A'),
-    (72384, 72447, 'Pau Cin Hau'),
-    (72448, 72543, 'Devanagari Extended-A'),
-    (72704, 72815, 'Bhaiksuki'),
-    (72816, 72895, 'Marchen'),
-    (72960, 73055, 'Masaram Gondi'),
-    (73056, 73135, 'Gunjala Gondi'),
-    (73440, 73471, 'Makasar'),
-    (73472, 73567, 'Kawi'),
-    (73648, 73663, 'Lisu Supplement'),
-    (73664, 73727, 'Tamil Supplement'),
-    (73728, 74751, 'Cuneiform'),
-    (74752, 74879, 'Cuneiform Numbers and Punctuation'),
-    (74880, 75087, 'Early Dynastic Cuneiform'),
-    (77712, 77823, 'Cypro-Minoan'),
-    (77824, 78895, 'Egyptian Hieroglyphs'),
-    (78896, 78943, 'Egyptian Hieroglyph Format Controls'),
-    (82944, 83583, 'Anatolian Hieroglyphs'),
-    (92160, 92735, 'Bamum Supplement'),
-    (92736, 92783, 'Mro'),
-    (92784, 92879, 'Tangsa'),
-    (92880, 92927, 'Bassa Vah'),
-    (92928, 93071, 'Pahawh Hmong'),
-    (93760, 93855, 'Medefaidrin'),
-    (93952, 94111, 'Miao'),
-    (94176, 94207, 'Ideographic Symbols and Punctuation'),
-    (94208, 100351, 'Tangut'),
-    (100352, 101119, 'Tangut Components'),
-    (101120, 101631, 'Khitan Small Script'),
-    (101632, 101759, 'Tangut Supplement'),
-    (110576, 110591, 'Kana Extended-B'),
-    (110592, 110847, 'Kana Supplement'),
-    (110848, 110895, 'Kana Extended-A'),
-    (110896, 110959, 'Small Kana Extension'),
-    (110960, 111359, 'Nushu'),
-    (113664, 113823, 'Duployan'),
-    (113824, 113839, 'Shorthand Format Controls'),
-    (118528, 118735, 'Znamenny Musical Notation'),
-    (118784, 119039, 'Byzantine Musical Symbols'),
-    (119040, 119295, 'Musical Symbols'),
-    (119296, 119375, 'Ancient Greek Musical Notation'),
-    (119488, 119519, 'Kaktovik Numerals'),
-    (119520, 119551, 'Mayan Numerals'),
-    (119552, 119647, 'Tai Xuan Jing Symbols'),
-    (119648, 119679, 'Counting Rod Numerals'),
-    (119808, 120831, 'Mathematical Alphanumeric Symbols'),
-    (120832, 121519, 'Sutton SignWriting'),
-    (122624, 122879, 'Latin Extended-G'),
-    (122880, 122927, 'Glagolitic Supplement'),
-    (122928, 123023, 'Cyrillic Extended-D'),
-    (123136, 123215, 'Nyiakeng Puachue Hmong'),
-    (123536, 123583, 'Toto'),
-    (123584, 123647, 'Wancho'),
-    (124112, 124159, 'Nag Mundari'),
-    (124896, 124927, 'Ethiopic Extended-B'),
-    (124928, 125151, 'Mende Kikakui'),
-    (125184, 125279, 'Adlam'),
-    (126064, 126143, 'Indic Siyaq Numbers'),
-    (126208, 126287, 'Ottoman Siyaq Numbers'),
-    (126464, 126719, 'Arabic Mathematical Alphabetic Symbols'),
-    (126976, 127023, 'Mahjong Tiles'),
-    (127024, 127135, 'Domino Tiles'),
-    (127136, 127231, 'Playing Cards'),
-    (127232, 127487, 'Enclosed Alphanumeric Supplement'),
-    (127488, 127743, 'Enclosed Ideographic Supplement'),
-    (127744, 128511, 'Miscellaneous Symbols and Pictographs'),
-    (128512, 128591, 'Emoticons'),
-    (128592, 128639, 'Ornamental Dingbats'),
-    (128640, 128767, 'Transport and Map Symbols'),
-    (128768, 128895, 'Alchemical Symbols'),
-    (128896, 129023, 'Geometric Shapes Extended'),
-    (129024, 129279, 'Supplemental Arrows-C'),
-    (129280, 129535, 'Supplemental Symbols and Pictographs'),
-    (129536, 129647, 'Chess Symbols'),
-    (129648, 129791, 'Symbols and Pictographs Extended-A'),
-    (129792, 130047, 'Symbols for Legacy Computing'),
-    (131072, 173791, 'CJK Unified Ideographs Extension B'),
-    (173824, 177983, 'CJK Unified Ideographs Extension C'),
-    (177984, 178207, 'CJK Unified Ideographs Extension D'),
-    (178208, 183983, 'CJK Unified Ideographs Extension E'),
-    (183984, 191471, 'CJK Unified Ideographs Extension F'),
-    (194560, 195103, 'CJK Compatibility Ideographs Supplement'),
-    (196608, 201551, 'CJK Unified Ideographs Extension G'),
-    (201552, 205743, 'CJK Unified Ideographs Extension H'),
-    (917504, 917631, 'Tags'),
-    (917760, 917999, 'Variation Selectors Supplement'),
-    (983040, 1048575, 'Supplementary Private Use Area-A'),
-    (1048576, 1114111, 'Supplementary Private Use Area-B')
-)
+DEBUG_LEVEL = 1
 
-codepoint_categories = {
-    'Lu': 'Uppercase Letter',
-    'Ll': 'Lowercase Letter',
-    'Lt': 'Titlecase Letter',
-    'LC': 'Cased Letter',
-    'Lm': 'Modifier Letter',
-    'Lo': 'Other Letter',
-    'L' : 'Letter',
-    'Mn': 'Nonspacing Combining Mark',
-    'Mc': 'Spacing Combining Mark',
-    'Me': 'Enclosing Combining Mark',
-    'M' : 'Mark',
-    'Nd': 'Decimal Digit',
-    'Nl': 'Letterlike Numeric Character',
-    'No': 'Other Numeric Character',
-    'N' : 'Number',
-    'Pc': 'Connector Punctuation',
-    'Pd': 'Dash or Hyphen Punctuation Mark',
-    'Ps': 'Opening Punctuation Mark (Pair)',
-    'Pe': 'Closing Punctuation Mark (Pair)',
-    'Pi': 'Initial Quotation Mark',
-    'Pf': 'Final Quotation Mark',
-    'Po': 'Other Punctuation',
-    'P' : 'Punctuation',
-    'Sm': 'Math Symbol',
-    'Sc': 'Currency Symbol',
-    'Sk': 'Non-letterlike Modifier Symbol',
-    'So': 'Other Symbol',
-    'S' : 'Symbol',
-    'Zs': 'Space Character',
-    'Zl': 'Line Separator',
-    'Zp': 'Paragraph Separator',
-    'Z' : 'Separator',
-    'Cc': 'C0/C1 Control Codes',
-    'Cf': 'Format Control Character',
-    'Cs': 'Surrogate Code Point',
-    'Co': 'Private Use Character',
-    'Cn': 'Unassigned',
-    'C' : 'Other'
-}
+# my path
+my_path = os.path.abspath(__file__)
+my_dir  = os.path.dirname(my_path)
+my_name = os.path.basename(my_path)
 
-control_codes = {
-    0   : 'NUL - Null',
-    1   : 'SOH - Start of Heading',
-    2   : 'STX - Start of Text',
-    3   : 'ETX - End of Text',
-    4   : 'EOT - End of Transmission',
-    5   : 'ENQ - Enquiry',
-    6   : 'ACK - Acknowledgement',
-    7   : 'BEL - Bell',
-    8   : 'BS - Backspace',
-    9   : 'HT - Horizontal Tab',
-    10  : 'LF - Line Feed (New Line)',
-    11  : 'VT - Vertical Tab',
-    12  : 'FF - Form Feed',
-    13  : 'CR - Carriage Return',
-    14  : 'SO - Shift Out',
-    15  : 'SI - Shift In',
-    16  : 'DLE - Data Link Escape',
-    17  : 'DC1 - Device Control 1',
-    18  : 'DC2 - Device Control 2',
-    19  : 'DC3 - Device Control 3',
-    20  : 'DC4 - Device Control 4',
-    21  : 'NAK - Negative Acknowledgement',
-    22  : 'SYN - Synchronous Idle',
-    23  : 'ETB - End of Transmission Block',
-    24  : 'CAN - Cancel',
-    25  : 'EM - End of Medium',
-    26  : 'SUB - Substitute',
-    27  : 'ESC - Escape',
-    28  : 'FS - File Separator',
-    29  : 'GS - Group Separator',
-    30  : 'RS - Record Separator',
-    31  : 'US - Unit Separator',
-    127 : 'DEL - Delete',
-    128 : '<Padding Character> (PAD)',
-    129 : '<High Octet Preset> (HOP)',
-    130 : '<Break Permitted Here> (BPH)',
-    131 : '<No Break Here> (NBH)',
-    132 : '<Index> (IND)',
-    133 : '<Next Line> (NEL)',
-    134 : '<Start of Selected Area> (SSA)',
-    135 : '<End of Selected Area> (ESA)',
-    136 : '<Character Tabulation Set> (HTS)',
-    137 : '<Character Tabulation with Justification> (HTJ)',
-    138 : '<Line Tabulation Set> (VTS)',
-    139 : '<Partial Line Down> (PLD)',
-    140 : '<Partial Line Backward> (PLU)',
-    141 : '<Reverse Index> (RI)',
-    142 : '<Single Shift Two> (SS2)',
-    143 : '<Single Shift Three> (SS3)',
-    144 : '<Device Control String> (DCS)',
-    145 : '<Private Use One> (PU1)',
-    146 : '<Private Use Two> (PU2)',
-    147 : '<Set Transmit State> (STS)',
-    148 : '<Cancel Character> (CCH)',
-    149 : '<Message Waiting> (MW)',
-    150 : '<Start of Guarded Area> (SPA)',
-    151 : '<End of Guarded Area> (EPA)',
-    152 : '<Start of String> (SOS)',
-    153 : '<Single Graphic Character Introducer> (SGC)',
-    154 : '<Single Character Introducer> (SCI)',
-    155 : '<Control Sequence Introducer> (CSI)',
-    156 : '<String Terminator> (ST)',
-    157 : '<Operating System Command> (OSC)',
-    158 : '<Privacy Message> (PM)',
-    159 : '<Application Program Command> (APC)'
-}
+# load Unicode data
+def json_load(filepath):
+    with open(filepath, encoding='utf-8') as f:
+        return json.load(f)
+unicode_blocks = json_load(os.path.join(my_dir, 'unicode_blocks.json'))
+codepoint_categories = json_load(os.path.join(my_dir, 'codepoint_categories.json'))
+control_codes = json_load(os.path.join(my_dir, 'control_codes.json'))
 
 # xterm formatting
-def f(code): return '\x1B[' + str(code) + 'm'
-def c(code): return f('38;5;' + str(code))
+def f(code):
+    return '\x1B[' + str(code) + 'm'
+def c(code):
+    return f('38;5;' + str(code))
 
-# common output function
-def unicode_info_output(number, hexnum, char):
+# warnings
+def warn(msg):
+    global DEBUG_LEVEL
+    if DEBUG_LEVEL: print(c(196) + str(msg) +f(0),
+                          file=sys.stderr)
 
+# read TOML file
+def read_configuration(my_dir, my_name):
+    c_file = os.path.splitext(my_name)[0] +'.toml'
+    c_path = os.path.join(my_dir, c_file)
+    if not os.path.exists(c_path):
+        warn('config not found at: ' + c_path)
+        return None
+    try:
+        with open(c_path, 'rb') as f:
+            return tomllib.load(f)
+    except:
+        warn('error reading toml: ' + c_path)
+        return None
+
+# parse arguments
+def get_arguments(my_name):
+    parser = argparse.ArgumentParser(prog=my_name)
+    # the DATA parameter
+    parser.add_argument('DATA',
+                        type=str,
+                        help='the data to investigate')
+    # group contains all possible TYPEs
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-u',
+                        action='store_true',
+                        help='Unicode point hexadecimal key')
+    group.add_argument('-d',
+                        action='store_true',
+                        help='Unicode point decimal key')
+    group.add_argument('-b',
+                        action='store_true',
+                        help='utf8 byte sequence (hexadecimal)')
+    group.add_argument('-s',
+                        action='store_true',
+                        help='sequence of characters (string)')
+    group.add_argument('-r',
+                        action='store_true',
+                        help='hexadecimal range')
+    return parser.parse_args()
+
+# common codepoint information
+def print_codepoint_info(decimal, hexnum, char):
     # U+hex key of the codepoint
     unicode_hex = hexnum[2:].upper()
-    while len(unicode_hex) < 4: unicode_hex = '0' + unicode_hex
+    while len(unicode_hex) < 4:
+        unicode_hex = '0' + unicode_hex
     unicode_point = f'U+{unicode_hex}'
-
     # red (non-ASCII)
-    col = 196 if number >= 128 else 44
-
+    col = 196 if decimal >= 128 else 44
     # utf8 byte sequence
     byte_seq = ' '.join(f'{b:02x}' for b in char.encode('utf-8'))
-
     # character to print
     ch = copy.copy(char)
     ch = ch.replace('\b', c(col) + '\\b' + f(39))
@@ -469,107 +91,97 @@ def unicode_info_output(number, hexnum, char):
     ch = ch.replace('\v', c(col) + '\\v' + f(39))
     ch = ch.replace('\f', c(col) + '\\f' + f(39))
     ch = ch.replace('\r', c(col) + '\\r' + f(39))
-
     # Unicode block
     block = 'unknown'
     try:
         for start, end, name in unicode_blocks:
-            if start <= number <= end:
+            if start <= decimal <= end:
                 block = name
     except:
         pass
-
     # codepoint category
     category = 'unknown'
     try:
         category = codepoint_categories[unicodedata.category(char)]
     except:
         pass
-
     # Unicode full name
     ucname = 'unknown'
-    if number in control_codes:
-        ucname = control_codes[number]
+    if decimal in control_codes:
+        ucname = control_codes[decimal]
     else:
         try:
             ucname = unicodedata.name(char)
         except:
             pass 
-
     # print
     print(c(col) + unicode_point + f(39),
-        '(' + str(number) + ')',
+        '(' + str(decimal) + ')',
         '[' + f(2) + byte_seq + f(22) + ']',
         'is:',
         ch,
         '(' + block,
-        '›',
+        chr(8250),
         category,
-        '›',
+        chr(8250),
         ucname + ')')
 
-# check syntax
-myname = sys.argv.pop(0).split('/')[-1]
-syntax = f'syntax: {myname} <type> <input>\n'
-syntax += 'types: s (string), d (decimal), h (hex), b (utf8 byte seq) or r (range)'
-if len(sys.argv) < 2: exit(syntax)
-
-# check arguments
-typ, inp = sys.argv[0].lower(), sys.argv[1]
-if not typ in 'sdhbr': exit(syntax)
-
-match typ:
-
-    # string
-    case 's':
-        for ch in inp:
-            nm = ord(ch)
-            hx = hex(nm)
-            unicode_info_output(nm, hx, ch)
-
-    # decimal
-    case 'd':
+def main() -> int:
+    # load configuration file
+    config = read_configuration(my_dir, my_name)
+    # get arguments.parameter and arguments.option
+    arguments = get_arguments(my_name)
+    # Unicode point key (hexadecimal)
+    if arguments.u:
+        nm = int()
         try:
-            nm = int(inp)
+            nm = int(arguments.DATA, 16)
         except:
-            exit('not a decimal number')
+            warn(f'{str(arguments.DATA)} is not a hexadecimal number')
         hx = hex(nm)
         ch = chr(nm)
-        unicode_info_output(nm, hx, ch)
-
-    # hexadecimal
-    case 'h':
+        print_codepoint_info(nm, hx, ch)
+    # Decimal Unicode point key
+    elif arguments.d:
         try:
-            nm = int(inp, 16)
+            nm = int(arguments.DATA)
         except:
-            exit('not a hex number')
+            warn(f'"{str(arguments.DATA)}" is not a decimal number')
+            return 1
         hx = hex(nm)
         ch = chr(nm)
-        unicode_info_output(nm, hx, ch)
-
-    # utf8 byte sequence
-    case 'b':
-        seq = str(inp).replace(' ', '').lower()
+        print_codepoint_info(nm, hx, ch)
+    # Byte sequence (utf8 hexadecimal)
+    elif arguments.b:
+        seq = str(arguments.DATA).replace(' ', '').lower()
         try:
             byte_seq = bytes.fromhex(seq)
         except:
-            exit(f'"{seq}" is not a valid hex byte sequence')
+            warn(f'"{seq}" is not a valid hex byte sequence')
+            return 1
         try:
             ch = byte_seq.decode('utf-8')
         except:
-            exit(f'{byte_seq} is not a valid utf8 byte sequence')
+            warn(f'{byte_seq} is not a valid utf8 byte sequence')
+            return 1
         nm = ord(ch)
         hx = hex(nm)
-        unicode_info_output(nm, hx, ch)
-
-    # range
-    case 'r':
-        smin, _, smax = inp.partition('-')
+        print_codepoint_info(nm, hx, ch)
+    # Series of characters (string)
+    elif arguments.s:
+        for ch in arguments.DATA:
+            nm = ord(ch)
+            hx = hex(nm)
+            print_codepoint_info(nm, hx, ch)
+    # Range of Unicode keys
+    elif arguments.r:
+        smin, _, smax = arguments.DATA.partition('-')
         try:
             imin, imax = int(smin,16), int(smax,16)
         except:
-            exit('syntax: unicode r <hexmin>-<hexmax>')
-        for nm in range(imin, imax+1):
+            warn('syntax: unicode r <hexmin>-<hexmax>')
+            return 1
+        for nm in range(imin, imax + 1):
             if nm in control_codes:
                 continue
             ch = chr(nm)
@@ -579,3 +191,8 @@ match typ:
                 except:
                     continue
         print()
+    # exit
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())
