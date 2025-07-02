@@ -3,7 +3,7 @@ Unicode / utf8 investigation
 
 [the code is pretty simple](https://github.com/haalven/unicodes/blob/main/unicode.py)
 
-usage: `./unicode.py -<TYPE> <INPUT>`
+usage: `./unicode.py <TYPE> <INPUT>`
 
 TYPE: `-u` (unicode hex key), `-d` (decimal key), `-b` (byte seq utf8), `-s` (string), or `-r` (range of hexkeys)
 
