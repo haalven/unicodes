@@ -1,7 +1,7 @@
 # unicodes
 Unicode / utf8 investigation
 
-[the code is pretty simple](https://github.com/haalven/unicodes/blob/main/unicode.py)
+the code is [pretty simple](https://github.com/haalven/unicodes/blob/main/unicode.py) and based on [broiler](https://github.com/haalven/broiler)
 
 usage: `./unicode.py <TYPE> <INPUT>`
 
