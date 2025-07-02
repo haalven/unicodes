@@ -9,7 +9,7 @@ TYPE: `-u` (unicode hex key), `-d` (decimal key), `-b` (byte seq utf8), `-s` (st
 
 ## investigate strange characters
 
-![example screenshot](example1.jpg)
+![example screenshot](example.png)
 
 - incl. utf-8 byte sequence
 - incl. Unicode block name
